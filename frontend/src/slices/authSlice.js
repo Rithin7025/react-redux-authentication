@@ -6,9 +6,9 @@ const initialState = {
 
 
 const authSlice = createSlice({
-    name : 'auth',
-    initialState,
-    reducers : {
+    name : 'auth', //name for this slice
+    initialState, 
+    reducers : { //here we specify the individual state transitions
         setCredentials : (state, action) =>{
             state.userInfo = action.payload;
             localStorage.setItem('userInfo',JSON.stringify(action.payload))
@@ -19,6 +19,8 @@ const authSlice = createSlice({
         }
     }
 })
+
+//reducer as default and actions as named exports
 
 
 export const {setCredentials, logout } = authSlice.actions;

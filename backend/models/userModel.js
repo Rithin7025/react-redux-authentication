@@ -16,6 +16,13 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    imagePath : {
+      type : String
+    },
+    blocked : {
+      type : Boolean,
+      default : false
+    }
   },
   {
     timestamps: true,

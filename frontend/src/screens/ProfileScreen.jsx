@@ -1,4 +1,4 @@
-import { Form, Button, Row, Col } from "react-bootstrap"
+import { Form, Button, Row, Col,Image } from "react-bootstrap"
 import FormContainer from "../components/FormContainer"
 import { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
@@ -14,6 +14,7 @@ const ProfileScreen = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [image,setImage] = useState(null )
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -21,27 +22,50 @@ const ProfileScreen = () => {
   const { userInfo } = useSelector((state) => state.auth)
   const [updateProfile, { isLoading }] = useUpdateUserMutation()
 
+  console.log('userInfo',userInfo)
+
+
   useEffect(() => {
     setName(userInfo.name)
     setEmail(userInfo.email)
   }, [userInfo.setName, userInfo.setEmail])
 
   const submitHandler = async (e) => {
+    console.log('-----------entered submit')
     e.preventDefault()
     if (password !== confirmPassword) {
       toast.error("passwords do not match!")
     } else {
 
       try {
-        const res = await updateProfile({
-          _id: userInfo._id,
-          name,
-          email,
-          password,
-        }).unwrap()
-
+       
         
-        dispatch(setCredentials({ ...res }))
+        const formData = new FormData()
+        console.log('entered fomm------------------->')
+        formData.append('_id',userInfo._id)
+        formData.append('name',name)
+        formData.append('email',email)
+       
+        formData.append('password',password)
+        formData.append('file',image)
+
+        console.log('------------------------',image)
+        
+        // const res = await updateProfile({
+        //   _id: userInfo._id,
+        //   name,
+        //   email,
+        //   password,
+        // }).unwrap()
+        console.log('end')
+        console.log(formData)
+
+        const res = await updateProfile(formData).unwrap();
+        console.log(res,'-------------------------------')
+
+        //doing an append method for sending image 
+
+        dispatch(setCredentials(res))
         toast.success("Profile updated")
       } catch (err) {
         toast.error(err?.data?.message || err.error)
@@ -49,9 +73,27 @@ const ProfileScreen = () => {
     }
   }
 
+  
+
   return (
     <FormContainer>
       <h1>Update Profile</h1>
+      <Col xs={6} md={4}>
+        <Image
+          style={{ width: "100px", marginRight: "20px" }}
+          src={`http://localhost:8000/Images/${userInfo.image}`}
+          roundedCircle
+        />
+      </Col>
+
+      <Form.Group className="my-2" controlId="image">
+        <Form.Label style={{ fontWeight: "bolder" }}> Edit profile </Form.Label>
+        <Form.Control
+          type="file"
+          onChange={(e) => setImage(e.target.files[0])}
+          hidden
+        ></Form.Control>
+      </Form.Group>
 
       <Form onSubmit={submitHandler}>
         <Form.Group className="my-2" controlId="name">
